@@ -8,13 +8,27 @@ internal class Program
     {
         string path = "Data/Students.dat";
 
+        //Если на рабочем столе отсутствует каталог Students создаем
+        CheckingDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Students"));
+        // Десериализация файла
         var students = DeserializeStudents(path);
 
-        var t = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+        var group=students.GroupBy(x => x.Group).ToList();
+
     }
-    
-    
-    public static Student[]? DeserializeStudents(string path)
+
+    /// <summary>Метод проверки на наличие каталога. Если нет то создаем</summary>
+    /// <param name="directory">Путь к каталогу</param>
+    private static DirectoryInfo CheckingDirectory(string directory)
+    {
+        DirectoryInfo info = new DirectoryInfo(directory);
+        if (!info.Exists)
+            info.Create();
+
+        return info;
+    }
+
+    private static Student[]? DeserializeStudents(string path)
     {
         BinaryFormatter formatter = new BinaryFormatter();
         Student[] students;
