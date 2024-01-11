@@ -14,6 +14,9 @@ namespace WorkWithFiles.Common
         /// <summary>Начальное имя файла</summary>
         public string FileName { get; }
 
+        /// <summary>Информация о каталоге</summary>
+        public DirectoryInfo DirectoryInfoName { get; private set; }
+
         /// <summary>Информация о последнем файле</summary>
         public FileInfo LastFilesInfo { get; private set; }
 
@@ -37,7 +40,7 @@ namespace WorkWithFiles.Common
             else
                 FileName = fileName;
 
-            CheckingDirectory(DirectoryName);
+            DirectoryInfoName=CheckingDirectory(DirectoryName);
         }
 
 
@@ -74,10 +77,11 @@ namespace WorkWithFiles.Common
 
         /// <summary>Удаление подкаталогов и вложенных файлов</summary>
         /// <param name="folder">Путь к корневому каталогу</param>
-        public  void deleteFolder(string folder,int minute)
+        public  bool deleteFolder(string folder,int minute)
         {
+            var result = false;
             try
-            {
+            {         
                 DirectoryInfo di = new DirectoryInfo(folder);
                 DirectoryInfo[] diA = di.GetDirectories();
                 FileInfo[] fi = di.GetFiles();
@@ -88,12 +92,12 @@ namespace WorkWithFiles.Common
                     {
                         Console.WriteLine($"Удален файл {f.Name}");
                         f.Delete();
-                    }
-                   
+                        return true;
+                    }                  
                 }
                 foreach (DirectoryInfo df in diA)
                 {
-                    deleteFolder(df.FullName,minute);
+                   return deleteFolder(df.FullName,minute);
                 }
                 if (di.GetDirectories().Length == 0 && di.GetFiles().Length == 0)
                 {
@@ -102,10 +106,9 @@ namespace WorkWithFiles.Common
                     {
                         Console.WriteLine($"Удален каталог {di.Name}");
                         di.Delete();
-                    }
-                       
+                        return true;
+                    }                   
                 }
-                   
             }
             catch (DirectoryNotFoundException ex)
             {
@@ -119,6 +122,7 @@ namespace WorkWithFiles.Common
             {
                 Console.WriteLine("Произошла ошибка: " + ex.Message);
             }
+           return false;
         }
 
         /// <summary>Поиск последнего файла в каталоге</summary>
@@ -151,10 +155,13 @@ namespace WorkWithFiles.Common
 
         /// <summary>Метод проверки на наличие каталога. Если нет то создаем</summary>
         /// <param name="directory">Путь к каталогу</param>
-        private void CheckingDirectory(string directory)
+        private DirectoryInfo CheckingDirectory(string directory)
         {
-            if (!Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
+            DirectoryInfo info = new DirectoryInfo(directory);
+            if (!info.Exists)
+                info.Create();
+
+            return info;
         }
 
         /// <summary>Создаем подкаталог в каталоге </summary>
