@@ -1,4 +1,5 @@
 ﻿
+using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FinalTask;
@@ -9,11 +10,24 @@ internal class Program
         string path = "Data/Students.dat";
 
         //Если на рабочем столе отсутствует каталог Students создаем
-        CheckingDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Students"));
+       var directory= CheckingDirectory(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Students"));
         // Десериализация файла
         var students = DeserializeStudents(path);
 
-        var group=students.GroupBy(x => x.Group).ToList();
+        var groups=students.GroupBy(x => x.Group).ToList();
+
+        foreach (var group in groups)
+        {
+            var fileInfo = new FileInfo(Path.Combine(directory.FullName, $"{group.Key}.txt"));
+
+            foreach (var student in group)
+            {
+                using (StreamWriter sw = fileInfo.AppendText())
+                {
+                    sw.WriteLine($"{student.Name}, {student.DateOfBirth.ToString("d")}");
+                }
+            }
+        }
 
     }
 
