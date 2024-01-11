@@ -10,7 +10,7 @@ internal class Program
 
         var students = DeserializeStudents(path);
 
-
+        var t = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
     }
     
     
